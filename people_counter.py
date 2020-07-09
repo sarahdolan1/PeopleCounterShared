@@ -74,9 +74,9 @@ trackableObjects = {}
  
 # initialize the total number of frames processed thus far, along
 # with the total number of objects that have moved either Right or Left
-totalFrames = 0
-totalLeft = 0
-totalRight = 0
+Total_Frames = 0
+Total_Left = 0
+Total_Right = 0
  
 # start the frames per second throughput estimator
 fps = FPS().start()
@@ -118,7 +118,7 @@ while True:
  
     # check to see if we should run a more computationally expensive
     # object detection method to aid our tracker
-    if totalFrames % args["skip_frames"] == 0:
+    if Total_Frames % args["skip_frames"] == 0:
         # set the status and initialize our new set of object trackers
         status = "Detecting"
         trackers = []
@@ -218,14 +218,14 @@ while True:
                 # is moving Right) AND the centroid is above the center
                 # line, count the object
                 if direction < 0 and centroid[1] < W // 2:
-                    totalRight += 1 
+                    Total_Right += 1 
                     to.counted = True
  
                 # if the direction is positive (indicating the object
                 # is moving Left) AND the centroid is below the
                 # center line, count the object
                 elif direction > 0 and centroid[1] > W // 2:
-                    totalLeft += 1
+                    Total_Left += 1
                     to.counted = True
  
         # store the trackable object in our dictionary
@@ -241,8 +241,8 @@ while True:
     # construct a tuple of information we will be displaying on the
     # frame
     info = [
-        ("Left", totalRight),
-        ("Right", totalLeft),
+        ("Left", Total_Right),
+        ("Right", Total_Left),
         ("Status", status),
     ]
  
@@ -265,7 +265,7 @@ while True:
         break
     # increment the total number of frames processed thus far and
     # then update the FPS counter
-    totalFrames += 1
+    Total_Frames += 1
     fps.update()
  
 # stop the timer and display FPS information
