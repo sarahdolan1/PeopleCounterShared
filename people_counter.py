@@ -7,39 +7,39 @@
 # -i videos/webcamfootage.mp4 -o output/output_wf1.avi
 
 # import the necessary packages
-import numpy as np
 import argparse
-import imutils
 import time
-import dlib
+import numpy as np
+import imutils
 import cv2
-from pyimagesearch.centroidtracker import CentroidTracker
-from pyimagesearch.trackableobject import TrackableObject
 from imutils.video import VideoStream
 from imutils.video import FPS
+import dlib
+from pyimagesearch.centroidtracker import CentroidTracker
+from pyimagesearch.trackableobject import TrackableObject
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-p", "--prototxt", required=True,
-    help="path to Caffe 'deploy' prototxt file")
+                help="path to Caffe 'deploy' prototxt file")
 ap.add_argument("-m", "--model", required=True,
-    help="path to Caffe pre-trained model")
+                help="path to Caffe pre-trained model")
 ap.add_argument("-i", "--input", type=str,
-    help="path to optional input video file")
+                help="path to optional input video file")
 ap.add_argument("-o", "--output", type=str,
-    help="path to optional output video file")
+                help="path to optional output video file")
 ap.add_argument("-c", "--confidence", type=float, default=0.4,
-    help="minimum probability to filter weak detections")
+                help="minimum probability to filter weak detections")
 ap.add_argument("-s", "--skip-frames", type=int, default=30,
-    help="# of skip frames between detections")
+                help="# of skip frames between detections")
 args = vars(ap.parse_args())
 
 # initialize the list of class labels MobileNet SSD was trained to
 # detect
 CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
-    "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
-    "dog", "horse", "motorbike", "person", "pottedplant", "sheep",
-    "sofa", "train", "tvmonitor"]
+           "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
+           "dog", "horse", "motorbike", "person", "pottedplant", "sheep",
+           "sofa", "train", "tvmonitor"]
 
 # load our serialized model from disk
 print("[INFO] loading model...")
@@ -57,8 +57,8 @@ else:
     print("[INFO] opening video file...")
     vs = cv2.VideoCapture(args["input"])
 
-# initialize the video writer (we'll instantiate later if need be)
-writer = None
+# initialize the video WRITER (we'll instantiate later if need be)
+WRITER = None
 
 # initialize the frame dimensions (we'll set them as soon as we read
 # the first frame from the video)
@@ -74,9 +74,9 @@ trackableObjects = {}
 
 # initialize the total number of frames processed thus far, along
 # with the total number of objects that have moved either Right or Left
-totalFrames = 0
-totalLeft = 0
-totalRight = 0
+TOTAL_FRAMES = 0
+TOTAL_LEFT = 0
+TOTAL_RIGHT = 0
 
 # start the frames per second throughput estimator
 fps = FPS().start()
@@ -104,23 +104,23 @@ while True:
         (H, W) = frame.shape[:2]
 
     # if we are supposed to be writing a video to disk, initialize
-    # the writer
-    if args["output"] is not None and writer is None:
+    # the WRITER
+    if args["output"] is not None and WRITER is None:
         fourcc = cv2.VideoWriter_fourcc(*"MJPG")
-        writer = cv2.VideoWriter(args["output"], fourcc, 30,
-            (W, H), True)
+        WRITER = cv2.VideoWriter(args["output"], fourcc, 30,
+                                 (W, H), True)
 
-    # initialize the current status along with our list of bounding
+    # initialize the current STATUS along with our list of bounding
     # box rectangles returned by either (1) our object detector or
     # (2) the correlation trackers
-    status = "Waiting"
+    STATUS = "Waiting"
     rects = []
 
     # check to see if we should run a more computationally expensive
     # object detection method to aid our tracker
-    if totalFrames % args["skip_frames"] == 0:
-        # set the status and initialize our new set of object trackers
-        status = "Detecting"
+    if TOTAL_FRAMES % args["skip_frames"] == 0:
+        # set the STATUS and initialize our new set of object trackers
+        STATUS = "Detecting"
         trackers = []
 
         # convert the frame to a blob and pass the blob through the
@@ -167,9 +167,9 @@ while True:
     else:
         # loop over the trackers
         for tracker in trackers:
-            # set the status of our system to be 'tracking' rather
+            # set the STATUS of our system to be 'tracking' rather
             # than 'waiting' or 'detecting'
-            status = "Tracking"
+            STATUS = "Tracking"
 
             # update the tracker and grab the updated position
             tracker.update(rgb)
@@ -179,7 +179,7 @@ while True:
             startX = int(pos.top())
             startY = int(pos.left())
             endX = int(pos.bottom())
-            endY = int(pos.right ())
+            endY = int(pos.right())
 
             # add the bounding box coordinates to the rectangles list
             rects.append((startX, startY, endX, endY))
@@ -218,14 +218,14 @@ while True:
                 # is moving Right) AND the centroid is above the center
                 # line, count the object
                 if direction < 0 and centroid[1] < W // 2:
-                    totalRight += 1
+                    TOTAL_RIGHT += 1
                     to.counted = True
 
                 # if the direction is positive (indicating the object
                 # is moving Left) AND the centroid is below the
                 # center line, count the object
                 elif direction > 0 and centroid[1] > W // 2:
-                    totalLeft += 1
+                    TOTAL_LEFT += 1
                     to.counted = True
 
         # store the trackable object in our dictionary
@@ -233,27 +233,27 @@ while True:
 
         # draw both the ID of the object and the centroid of the
         # object on the output frame
-        text = "ID {}".format(objectID)
-        cv2.putText(frame, text, (centroid[1] - 10, centroid[0] -10),
-            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
+        TEXT = "ID {}".format(objectID)
+        cv2.putText(frame, TEXT, (centroid[1] - 10, centroid[0] -10),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
         cv2.circle(frame, (centroid[1], centroid[0]), 4, (255, 255, 255), -1)
 
     # construct a tuple of information we will be displaying on the
     # frame
     info = [
-        ("Left", totalRight),
-        ("Right", totalLeft),
-        ("Status", status),
+        ("Left", TOTAL_RIGHT),
+        ("Right", TOTAL_LEFT),
+        ("STATUS", STATUS),
     ]
 
     # loop over the info tuples and draw them on our frame
     for (i, (k, v)) in enumerate(info):
-        text = "{}: {}".format(k, v)
-        cv2.putText(frame, text, (10, H - ((i * 20) + 20)),
-            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 2)
+        TEXT = "{}: {}".format(k, v)
+        cv2.putText(frame, TEXT, (10, H - ((i * 20) + 20)),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 2)
     # check to see if we should write the frame to disk
-    if writer is not None:
-        writer.write(frame)
+    if WRITER is not None:
+        WRITER.write(frame)
 
     # show the output frame
     cv2.imshow("Frame", frame)
@@ -264,16 +264,16 @@ while True:
         break
     # increment the total number of frames processed thus far and
     # then update the FPS counter
-    totalFrames += 1
+    TOTAL_FRAMES += 1
     fps.update()
 # stop the timer and display FPS information
 fps.stop()
 print("[INFO] elapsed time: {:.2f}".format(fps.elapsed()))
 print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
 
-# check to see if we need to release the video writer pointer
-if writer is not None:
-    writer.release()
+# check to see if we need to release the video WRITER pointer
+if WRITER is not None:
+    WRITER.release()
 
 # if we are not using a video file, stop the camera video stream
 if not args.get("input", False):
