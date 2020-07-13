@@ -1,7 +1,7 @@
 # USAGE
 # set https_proxy=http://proxy.ch.intel.com:911
 # set http_proxy=http://proxy.ch.intel.com:911
-# cd C:\Users\sorchaco\Documents\PersonCounter\people-counting-opencv\people-counting-opencv
+# cd C:\Users\Documents\PersonCounter\people-counting-opencv\people-counting-opencv
 # python _counter.py
 # -p mobilenet_ssd/MobileNetSSD_deploy.prototxt  -m mobilenet_ssd/MobileNetSSD_deploy.caffemodel
 # -i videos/webcamfootage.mp4 -o output/output_wf1.avi
