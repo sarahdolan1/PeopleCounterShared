@@ -10,12 +10,15 @@ cap = cv2.VideoCapture(webcamfootage)
 if (cap.isOpened()== False):
   print("Error opening video stream or file")
 
-def __draw_label(img, text, pos, bg_color):
+def write_text(img, text, pos, bg_color):
     font_face = cv2.FONT_HERSHEY_SIMPLEX
-    scale = 0.4
+    scale = 0.7
     color = (0, 0, 0)
     thickness = cv2.FILLED
     margin = 2
+    W = 1300
+    H = 1000
+
 
     txt_size = cv2.getTextSize(text, font_face, scale, thickness)
 
@@ -24,16 +27,20 @@ def __draw_label(img, text, pos, bg_color):
 
     cv2.rectangle(img, pos, (end_x, end_y), bg_color, thickness)
     cv2.putText(img, text, pos, font_face, scale, color, 1, cv2.LINE_AA)
+    cv2.line(frame, (W // 2, 0), (W // 2, H), (0, 0, 255), 2)
 
 # Read until video is completed
 while(cap.isOpened()):
   # Capture frame-by-frame
   ret, frame = cap.read()
   if ret == True:
-    
-   # draw the label into the frame
-   __draw_label(frame, 'Hello World', (20,20), (255,0,0))
 
+   # draw the label into the frame
+   write_text(frame, 'People Counter by Sorcha and Sarah :)', (20,20), (255,0,0))
+   write_text(frame, 'TOTAL UP', (20, 600), (0,255,0))
+   write_text(frame, 'TOTAL RIGHT ', (20, 625), (0,0,225))
+   write_text(frame, 'STATUS ', (20, 650), (255, 0, 0))
+   write_text(frame, 'sarah and sorcha got the code working wooo', (400,400),(255,255,0))
    # Display the resulting frame
    cv2.imshow('Frame',frame)
 
@@ -50,4 +57,3 @@ cap.release()
 
 # Closes all the frames
 cv2.destroyAllWindows()
-
