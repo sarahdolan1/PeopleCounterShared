@@ -1,22 +1,47 @@
-#these function will get detections and be a centroid tracker
-'''def trackPeople():
-    CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
-               "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
-               "dog", "horse", "motorbike", "person", "pottedplant", "sheep",
-               "sofa", "train", "tvmonitor"]
+# these function will get detections and be a centroid tracker
+def trackPeople():
+    CLASSES = [
+        "background",
+        "aeroplane",
+        "bicycle",
+        "bird",
+        "boat",
+        "bottle",
+        "bus",
+        "car",
+        "cat",
+        "chair",
+        "cow",
+        "diningtable",
+        "dog",
+        "horse",
+        "motorbike",
+        "person",
+        "pottedplant",
+        "sheep",
+        "sofa",
+        "train",
+        "tvmonitor",
+    ]
 
     return CLASSES
-def centroidTracker():
-    #find centroids of poeple to help track people
-      # instantiate our centroid tracker, then initialize a list to store each of our dlib correlation
-    # trackers, followed by a dictionary to map each unique object ID to a TrackableObject
-     ct = CentroidTracker(maxDisappeared=40, maxDistance=400)
-     trackers = []
-     trackableObjects = {}
-     STATUS = "Waiting"
-     rects = []
 
-     if TOTAL_FRAMES % args["skip_frames"] == 0:
+
+def centroidTracker(skip_frames, confidence):
+    # find centroids of poeple to help track people
+    # instantiate our centroid tracker, then initialize a list to store each of our dlib correlation
+    # trackers, followed by a dictionary to map each unique object ID to a TrackableObject
+    ct = CentroidTracker(maxDisappeared=40, maxDistance=400)
+    trackers = []
+    trackableObjects = {}
+    STATUS = "Waiting"
+    rects = []
+
+    TOTAL_FRAMES = 0
+    TOTAL_LEFT = 0
+    TOTAL_RIGHT = 0
+
+    if TOTAL_FRAMES % skip_frames == 0:
         STATUS = "Detecting"
         trackers = []
         blob = cv2.dnn.blobFromImage(frame, 0.007843, (W, H), 127.5)
@@ -61,16 +86,18 @@ def centroidTracker():
             direction = centroid[1] - np.mean(y)
             to.centroids.append(centroid)
 
-        trackableObjects[objectID] = to'''
+        trackableObjects[objectID] = to
 
-#def getDetections():
-#use blob to get the dections to detect the people
-#return
 
-#def centroidTracker():
-#find centroids of poeple to help track people
-#return
+# def getDetections():
+# use blob to get the dections to detect the people
+# return
 
-#def checkBoundary():
-#used in future final code; irrelevant for now
-#return
+# def centroidTracker():
+# find centroids of poeple to help track people
+# return
+
+# def checkBoundary():
+# used in future final code; irrelevant for now
+# return
+
