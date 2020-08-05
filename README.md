@@ -6,7 +6,7 @@ inpsiration for the code https://www.pyimagesearch.com/2018/08/13/opencv-people-
 # Recent Updates:
 * All neccessary documents have been uploaded; (videos have not, as no videos will be shared for this code).
 * We are currently adding functions to code so there is constant changes in this Git.
-* Function_updates is the file that contains our "functioned" code. please ingore that file.
+* Function_updates is the file the file we post daily commits . please ingore that file .There is no need to downlaod this file!
 
 # How To Use:
 for video use run : python people_counter.py -p mobilenet_ssd\MobileNetSSD_deploy.prototxt -m mobilenet_ssd\MobileNetSSD_deploy.caffemodel  -i videos/example_03.mp4 -o output/output_03.avi
