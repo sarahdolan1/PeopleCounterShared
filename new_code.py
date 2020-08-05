@@ -9,7 +9,6 @@ from imutils.video import FPS
 import dlib
 from pyimagesearch.centroidtracker import CentroidTracker
 from pyimagesearch.trackableobject import TrackableObject
-import new_detections
 from new_detections import centroid_tracker
 
 def main():
@@ -52,6 +51,7 @@ def main():
     total_frames = 0
 
     net = cv2.dnn.readNetFromCaffe(args["prototxt"], args["model"])
+    ct = CentroidTracker(maxDisappeared=40, maxDistance=50)
 
     # Check if camera opened successfully
     if cap.isOpened() == False:
@@ -69,14 +69,14 @@ def main():
             # then convert the frame from BGR to RGB for dlib
             frame = imutils.resize(frame, width=300)
 
-            detections = get_detections(frame, net)
-            centroid = centroid_tracker(detections, frame, net)
-            new_detections.centroid_tracker(detections, frame, net)
-
-            # movement = movementcounter(direction, centroid)
+            # returns bounding boxes for people
+            new_people = get_people(frame, net)
+            # take people BBOXes, check if they are already in the tracker
+            check_if_people_in_tracker(new_people)
+            total_left, total_right = update_tracker(ct, new_people, frame, net)
 
             # draw the label into the frame
-            write_text(frame, " ", (20, 487), (0, 255, 0))
+            write_text(frame, " ", (20, 487),total_left, total_right, (0, 255, 0))
 
             # Display the resulting frame
             cv2.imshow("People Counter", frame)
@@ -101,19 +101,66 @@ def main():
     cv2.destroyAllWindows()
 
 
-def get_detections(frame, net):
+def get_people(frame, net):
+        # initialize the list of class labels MobileNet SSD was trained to detect
+    classes = [
+        "background",
+        "aeroplane",
+        "bicycle",
+        "bird",
+        "boat",
+        "bottle",
+        "bus",
+        "car",
+        "cat",
+        "chair",
+        "cow",
+        "diningtable",
+        "dog",
+        "horse",
+        "motorbike",
+        "person",
+        "pottedplant",
+        "sheep",
+        "sofa",
+        "train",
+        "tvmonitor",
+    ]
+
+    people_list = []
+    # set the confidence value an, values for height and width
+    min_confidence = 0.4
 
     # if the frame dimensions are empty, set them
     (height, width) = frame.shape[:2]
 
+    # convert the frame to a blob and pass the blob through the network and
+    # obtain the detections
     blob = cv2.dnn.blobFromImage(frame, 0.007843, (width, height), 127.5)
     net.setInput(blob)
     detections = net.forward()
 
-    return detections
+    # loop over the detections
+    for i in np.arange(0, detections.shape[2]):
+        # extract the confidence (i.e., probability) associated with the prediction
+        confidence = detections[0, 0, i, 2]
+        # filter out weak detections by requiring a minimum confidence
+        if confidence > (min_confidence):
+            idx = int(detections[0, 0, i, 1])
+
+            # if the class label is not a person, ignore it
+            if classes[idx] == "person":
+                # compute the (x, y_coordinate)-coordinates of the bounding box for the object
+                box = detections[0, 0, i, 3:7] * np.array(
+                    [width, height, width, height]
+                )
+                (start_x, start_y, end_x, end_y) = box.astype("int")
+                people_list.append((start_x, start_y, end_x, end_y))
+
+    return people_list
 
 
-def write_text(img, text, pos, bg_color):
+def write_text(img, text, pos, total_left, total_right, bg_color):
     font_face = cv2.FONT_HERSHEY_SIMPLEX
     scale = 0.4
     color = (0, 0, 0)
@@ -137,10 +184,6 @@ def write_text(img, text, pos, bg_color):
 
     # initialize the total number of frames processed thus far, along with
     # the total number of objects that have moved either Right or Left
-    total_frames = 0
-    total_left = 0
-    total_right = 0
-
     status = 1
 
     # construct a tuple of information we will be displaying on the frame

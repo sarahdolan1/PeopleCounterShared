@@ -4,7 +4,7 @@ import dlib
 from pyimagesearch.centroidtracker import CentroidTracker
 from pyimagesearch.trackableobject import TrackableObject
 
-def centroid_tracker(detections, frame, net):
+def update_tracker(ct, detections, frame, net):
     # find centroid of poeple to help track people
     # instantiate our centroid tracker, then initialize a list to store each of our dlib correlation
     # trackers, followed by a dictionary to map each unique object ID to a TrackableObject
@@ -13,45 +13,14 @@ def centroid_tracker(detections, frame, net):
     # (the less data we have, the faster we can process it),
     # then convert the frame from BGR to RGB for dlib
     rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    ct = CentroidTracker(maxDisappeared=40, maxDistance=50)
+    
 
     # initialize the current status along with our list of
     # bounding box rectangles returned by either
     # (1) our object detector or (2) the correlation trackers
     status = "Waiting"
     rects = []
-
     trackable_objects = {}
-
-    # set the confidence value an, values for height and width
-    confidence1 = 0.4
-    width = 300
-    height = 200
-
-    # initialize the list of class labels MobileNet SSD was trained to detect
-    classes = [
-        "background",
-        "aeroplane",
-        "bicycle",
-        "bird",
-        "boat",
-        "bottle",
-        "bus",
-        "car",
-        "cat",
-        "chair",
-        "cow",
-        "diningtable",
-        "dog",
-        "horse",
-        "motorbike",
-        "person",
-        "pottedplant",
-        "sheep",
-        "sofa",
-        "train",
-        "tvmonitor",
-    ]
 
     total_frames = 0
     total_left = 0
@@ -64,28 +33,7 @@ def centroid_tracker(detections, frame, net):
         status = "Detecting"
         trackers = []
 
-        # convert the frame to a blob and pass the blob through the network and
-        # obtain the detections
-        blob = cv2.dnn.blobFromImage(frame, 0.007843, (width, height), 127.5)
-        net.setInput(blob)
-        detections = net.forward()
 
-        # loop over the detections
-        for i in np.arange(0, detections.shape[2]):
-            # extract the confidence (i.e., probability) associated with the prediction
-            confidence = detections[0, 0, i, 2]
-            # filter out weak detections by requiring a minimum confidence
-            if confidence > (confidence1):
-                idx = int(detections[0, 0, i, 1])
-
-                # if the class label is not a person, ignore it
-                if classes[idx] != "person":
-                    continue
-                # compute the (x, y_coordinate)-coordinates of the bounding box for the object
-                box = detections[0, 0, i, 3:7] * np.array(
-                    [width, height, width, height]
-                )
-                (start_x, start_y, end_x, end_y) = box.astype("int")
                 # construct a dlib rectangle object from the bounding box
                 # coordinates and then start the dlib correlation tracker
                 tracker = dlib.correlation_tracker()
