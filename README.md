@@ -1,13 +1,13 @@
 # People Counter Shared
-As part of our summer internship myself and sorcha have been asked to make a people counter code.
-This code uses openCV and python to track people walking across a line in the middle of the screen whislt tracking their direction.
-inpsiration for the code https://www.pyimagesearch.com/2018/08/13/opencv-people-counter/
+As part of our summer internship, Sorcha and I have been asked to make a people counter code.
+This code uses openCV and python to track people walking across a line in the middle of the screen whilst tracking their direction.
+inspiration for the code https://www.pyimagesearch.com/2018/08/13/opencv-people-counter/
 
-# Recent Updates:
-* All neccessary documents have been uploaded; (videos have not, as no videos will be shared for this code).
-* We are currently adding functions to code so there is constant changes in this Git.
+## Recent Updates:
+* All necessary documents have been uploaded; (videos have not, as no videos will be shared for this code).
+* We are currently adding functions to code so there are constant changes in this Git.
 
-# How To Use:
+## How To Use:
 for use run : python new_code.py -p mobilenet_ssd\MobileNetSSD_deploy.prototxt -m mobilenet_ssd\MobileNetSSD_deploy.caffemodel  -i videos/example_03.mp4 -o output/output_03.avi
 
 ## Folders
@@ -18,7 +18,7 @@ pyimagesearch => Contains further code used to support the main people counter f
 
 ## Arguments
 -p and -m provide the model. These are required and can be typed exactly as shown.  
--i and -o are optional, input and output arguments.  
+-i and -o are optional, input & output arguments.  
 
 For the input, the example input LeftRight.mp4 can be used or any video you choose.  
 If no input is given, the live video from your webcam will be used instead.  
@@ -32,7 +32,7 @@ If no output argument is given, the output shown will not be saved or stored.
      3. Download this git repo as a zip
      4. Extract the file to the Documents directory
 
-## Running the code
+## Running The Code
      5. Change directory
           ~ cd C:\Users\<USERNAME>\Documents\PeopleCounterShared
      6. Run the code
