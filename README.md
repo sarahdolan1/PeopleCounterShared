@@ -40,4 +40,4 @@ If no output argument is given, the output shown will not be saved or stored.
      5. Change directory
           ~ cd C:\Users\<USERNAME>\Documents\PeopleCounterShared
      6. Run the code
-          ~ python people_counter.py -p mobilenet_ssd\MobileNetSSD_deploy.prototxt -m mobilenet_ssd\MobileNetSSD_deploy.caffemodel -i example_inputs\LeftRight.mp4 -o example_outputs\LeftRight-O.avi
+          ~ python new_code.py -p mobilenet_ssd\MobileNetSSD_deploy.prototxt -m mobilenet_ssd\MobileNetSSD_deploy.caffemodel -i example_inputs\LeftRight.mp4 -o example_outputs\LeftRight-O.avi
