@@ -191,18 +191,33 @@ def get_people(frame, net, trackers, min_confidence=0.4):
     ]
 
     people_list = []
-    print(people_list)
+
     (height, width) = frame.shape[:2]
 
     blob = cv2.dnn.blobFromImage(frame, 0.007843, (width, height), 127.5)
     net.setInput(blob)
-    people_list = net.forward()
-
+    detections = net.forward()
     ##we think its broken here ie doesnt go into the for loop
     status = "Detecting"
-    print("jello1")
+
+    # loop over the detections
+    for i in np.arange(0, detections.shape[2]):
+        # extract the confidence (i.e., probability) associated
+        # with the prediction
+        confidence = detections[0, 0, i, 2]
+        # filter out weak detections by requiring a minimum
+        # confidence
+        if confidence > args["confidence"]:
+            # extract the index of the class label from the
+            # detections list
+            idx = int(detections[0, 0, i, 1])
+            # if the class label is not a person, ignore it
+            if classes[idx] == "person":
+                box = detections[0, 0, i, 3:7] * np.array([W, H, W, H])
+                people_list.append(box)
+
+    print(people_list)
     for people in people_list:
-        print("jello2")
         tracker = dlib.correlation_tracker()
         print("jello3")
         (start_x, start_y, end_x, end_y) = people
