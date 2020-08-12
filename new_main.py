@@ -100,11 +100,9 @@ def display_output(image, res, min_confidence=0.2):
 
 def load_network(prototxt_path, model_path):
     """we are trying to load a caffe network from disk
-
     Args:
             prototxt_path ([type]):filepath for the caffeProto
             model_path ([type]): Filepath for the caffemodel
-
     Returns:
             net: cv2.dnn network
     """
@@ -115,7 +113,6 @@ def load_network(prototxt_path, model_path):
 
 def parse_arguments():
     """parses arguments
-
     Returns:
             args
     """
@@ -156,12 +153,10 @@ def parse_arguments():
 
 def get_people(frame, net, trackers, min_confidence=0.4):
     """ detect people
-
     Args:
             frame (uint8): image
             net (cv2.dnn): neural network
             min_confidence (float): minimum for detection, defaults to 0.4
-
     Returns:
             people_list: list of bounding boxes containing people
     """
@@ -207,14 +202,17 @@ def get_people(frame, net, trackers, min_confidence=0.4):
         confidence = detections[0, 0, i, 2]
         # filter out weak detections by requiring a minimum
         # confidence
-        if confidence > args["confidence"]:
+        if confidence > min_confidence:
+            print(confidence)
             # extract the index of the class label from the
             # detections list
             idx = int(detections[0, 0, i, 1])
+            print(idx, classes[idx])
             # if the class label is not a person, ignore it
-            if classes[idx] == "person":
-                box = detections[0, 0, i, 3:7] * np.array([W, H, W, H])
-                people_list.append(box)
+         #   if classes[idx] == "person":
+            box = detections[0, 0, i, 3:7] * np.array([width, height, width, height])
+            box = box.astype("int")
+            people_list.append(box)
 
     print(people_list)
     for people in people_list:
@@ -223,6 +221,7 @@ def get_people(frame, net, trackers, min_confidence=0.4):
         (start_x, start_y, end_x, end_y) = people
         rect = dlib.rectangle(start_x, start_y, end_x, end_y)
         print("Person Detected")
+        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         tracker.start_track(rgb, rect)
         trackers.append(tracker)
     print("jello4")
@@ -230,19 +229,17 @@ def get_people(frame, net, trackers, min_confidence=0.4):
     #(start_x, start_y, end_x, end_y) = box.astype("int")
 
     # detections = entire list of detections; need to be threshholded; detections must be a person
-
+    print(people_list)
     return people_list
 
 
 def update_tracker(frame, trackers):
     """Track people over time
-
     Args:
             ct ([type]): dlib centroid tracker
             people_list ([type]): list of bounding boxes containing people
             frame ([type]): image
             net ([type]): neural network
-
     Returns:
             None
     """
@@ -284,11 +281,11 @@ def count_people(ct, people_list, trackable_objects):
 
             if not to.counted:
 
-                if direction < 0 and centroid[1] < W // 2:
+                if direction < 0 and centroid[1] < width // 2:
                     right += 1
                     to.counted = True
 
-                elif direction > 0 and centroid[1] > W // 2:
+                elif direction > 0 and centroid[1] > width // 2:
                     left += 1
                     to.counted = True
 
@@ -298,7 +295,6 @@ def count_people(ct, people_list, trackable_objects):
 
 def write_text(img, text, pos, bg_color):
     """[summary]
-
     Args:
             img ([type]): image
             text ([type]): overlay text
@@ -324,4 +320,3 @@ def write_text(img, text, pos, bg_color):
 
 if __name__ == "__main__":
     main()
-
