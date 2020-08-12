@@ -158,6 +158,7 @@ def get_people(frame, net, trackers, min_confidence=0.4):
     Returns:
             people_list: list of bounding boxes containing people
     """
+
     classes = [
         "background",
         "aeroplane",
@@ -183,6 +184,7 @@ def get_people(frame, net, trackers, min_confidence=0.4):
     ]
 
     people_list = []
+    print(people_list)
     (height, width) = frame.shape[:2]
 
     blob = cv2.dnn.blobFromImage(frame, 0.007843, (width, height), 127.5)
@@ -190,16 +192,19 @@ def get_people(frame, net, trackers, min_confidence=0.4):
     detections = net.forward()
 
     status = "Detecting"
+    print("jello1")
     for people in people_list:
+        print("jello2")
         tracker = dlib.correlation_tracker()
-
-        (startX, startY, endX, endY) = people
+        print("jello3")
+        (start_x, start_y, end_x, end_y) = people
         rect = dlib.rectangle(start_x, start_y, end_x, end_y)
         print("Person Detected")
         tracker.start_track(rgb, rect)
         trackers.append(tracker)
+    print("jello4")
     #box = detections[0, 0, i, 3:7] * np.array([width, height, width, height])
-    #(startX, startY, endX, endY) = box.astype("int")
+    #(start_x, start_y, end_x, end_y) = box.astype("int")
 
   # detections = entire list of detections; need to be threshholded; detections must be a person
 
@@ -234,7 +239,7 @@ def update_tracker(frame, trackers):
         end_x = int(pos.bottom())
         end_y = int(pos.right())
 
-        people_list.append((startX, startY, endX, endY))
+        people_list.append((start_x, start_y, end_x, end_y))
     return people_list
 
 
@@ -279,7 +284,6 @@ def write_text(img, text, pos, bg_color):
     """
 
 # def output():
-
 
 if __name__ == "__main__":
     main()
