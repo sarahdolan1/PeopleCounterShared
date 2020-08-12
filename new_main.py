@@ -1,12 +1,12 @@
 import argparse
+import time
 import cv2
-import dlib
 import numpy as np
 import imutils
+from imutils.video import VideoStream
+import dlib
 from pyimagesearch.centroidtracker import CentroidTracker
 from pyimagesearch.trackableobject import TrackableObject
-from imutils.video import VideoStream
-import time
 
 
 def main():
@@ -28,6 +28,8 @@ def main():
     skip_frames = 40
     while video.isOpened():
         ret, frame = video.read()
+        write_text(frame, " ", (20, 230), (0, 255, 0))
+
 
         if total_frames % (skip_frames) == 0:
             people_list = get_people(frame, net, trackers, min_confidence=0.4)
@@ -90,8 +92,8 @@ def display_output(image, res, min_confidence=0.2):
     # Draw boxes for all predictions.
     for imid in classes:
         for box in boxes[imid]:
-            cv2.rectangle(image, (box[0], box[1]),
-                          (box[2], box[3]), (232, 35, 244), 2)
+            cv2.rectangle(image, (box[0], box[1]), (box[2], box[3]),
+                          (232, 35, 244), 2)
     # Return image with boxes drawn on it.
     return image
 
@@ -118,17 +120,22 @@ def parse_arguments():
             args
     """
     ap = argparse.ArgumentParser()
-    ap.add_argument(
-        "-p", "--prototxt", required=True, help="path to Caffe 'deploy' prototxt file"
-    )
-    ap.add_argument(
-        "-m", "--model", required=True, help="path to Caffe pre-trained model"
-    )
-    ap.add_argument("-i", "--input", type=str,
+    ap.add_argument("-p",
+                    "--prototxt",
+                    required=True,
+                    help="path to Caffe 'deploy' prototxt file")
+    ap.add_argument("-m",
+                    "--model",
+                    required=True,
+                    help="path to Caffe pre-trained model")
+    ap.add_argument("-i",
+                    "--input",
+                    type=str,
                     help="path to optional input video file")
-    ap.add_argument(
-        "-o", "--output", type=str, help="path to optional output video file"
-    )
+    ap.add_argument("-o",
+                    "--output",
+                    type=str,
+                    help="path to optional output video file")
     ap.add_argument(
         "-c",
         "--confidence",
@@ -189,8 +196,9 @@ def get_people(frame, net, trackers, min_confidence=0.4):
 
     blob = cv2.dnn.blobFromImage(frame, 0.007843, (width, height), 127.5)
     net.setInput(blob)
-    detections = net.forward()
+    people_list = net.forward()
 
+    ##we think its broken here ie doesnt go into the for loop
     status = "Detecting"
     print("jello1")
     for people in people_list:
@@ -206,7 +214,7 @@ def get_people(frame, net, trackers, min_confidence=0.4):
     #box = detections[0, 0, i, 3:7] * np.array([width, height, width, height])
     #(start_x, start_y, end_x, end_y) = box.astype("int")
 
-  # detections = entire list of detections; need to be threshholded; detections must be a person
+    # detections = entire list of detections; need to be threshholded; detections must be a person
 
     return people_list
 
@@ -229,7 +237,7 @@ def update_tracker(frame, trackers):
     people_list = []
 
     for tracker in trackers:
-        STATUS = "Tracking"
+        status = "Tracking"
         tracker.update(rgb)
         pos = tracker.get_position()
 
@@ -282,8 +290,23 @@ def write_text(img, text, pos, bg_color):
             pos ([type]): position of the text
             bg_color ([type]): text colour
     """
+    height = 1000
+    width = 1275
+    font_face = cv2.FONT_HERSHEY_SIMPLEX
+    scale = 0.4
+    color = (0, 0, 0)
+    thickness = cv2.FILLED
+    margin = 2
+    txt_size = cv2.getTextSize(text, font_face, scale, thickness)
 
-# def output():
+    end_x = pos[0] + txt_size[0][0] + margin
+    end_y = pos[1] - txt_size[0][1] - margin
+
+    cv2.rectangle(img, pos, (end_x, end_y), bg_color, thickness)
+    cv2.putText(img, text, pos, font_face, scale, color, 1, cv2.LINE_AA)
+    cv2.line(img, (width // 2, 0), (width // 2, height), (0, 0, 255), 2)
+
 
 if __name__ == "__main__":
     main()
+
