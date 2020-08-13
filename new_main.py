@@ -8,7 +8,6 @@ import dlib
 from pyimagesearch.centroidtracker import CentroidTracker
 from pyimagesearch.trackableobject import TrackableObject
 
-
 def main():
     # passing arguments
     args = parse_arguments()
@@ -186,7 +185,7 @@ def get_people(frame, net, trackers, min_confidence=0.4):
     ]
 
     people_list = []
-
+    frame = imutils.resize(frame, width = 500)
     (height, width) = frame.shape[:2]
 
     blob = cv2.dnn.blobFromImage(frame, 0.007843, (width, height), 127.5)
@@ -267,9 +266,10 @@ def count_people(ct, people_list, trackable_objects):
     left = 0
     right = 0
     objects = ct.update(people_list)
-
+    height = 1350
+    width = 1000
     for (objectID, centroid) in objects.items():
-        to = trackableObjects.get(objectID, None)
+        to = trackable_objects.get(objectID, None)
 
         if to is None:
             to = TrackableObject(objectID, centroid)
@@ -289,7 +289,8 @@ def count_people(ct, people_list, trackable_objects):
                     left += 1
                     to.counted = True
 
-        trackableObjects[objectID] = to
+        trackable_objects[objectID] = to
+
     return right, left
 
 
@@ -301,8 +302,8 @@ def write_text(img, text, pos, bg_color):
             pos ([type]): position of the text
             bg_color ([type]): text colour
     """
-    height = 1000
-    width = 1275
+    height =500
+    width = 500
     font_face = cv2.FONT_HERSHEY_SIMPLEX
     scale = 0.4
     color = (0, 0, 0)
@@ -318,5 +319,7 @@ def write_text(img, text, pos, bg_color):
     cv2.line(img, (width // 2, 0), (width // 2, height), (0, 0, 255), 2)
 
 
+
 if __name__ == "__main__":
     main()
+    
