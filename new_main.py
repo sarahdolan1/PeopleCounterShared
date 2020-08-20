@@ -24,29 +24,31 @@ def main():
     total_frames = 0
     total_right = 0
     total_left = 0
-    skip_frames = 40
+    skip_frames = 10
     while video.isOpened():
         ret, frame = video.read()
-        write_text(frame, " ", (20, 230), (0, 255, 0))
+        frame = imutils.resize(frame, width = 500)
+        frame = write_text(frame, " leftyyyyy", (20, 230), (0, 255, 0))
 
+        # if total_frames % (skip_frames) == 0:
 
-        if total_frames % (skip_frames) == 0:
-            people_list = get_people(frame, net, trackers, min_confidence=0.4)
+        people_list = get_people(frame, net, trackers, min_confidence=0.4)
 
-        else:
-            people_list = update_tracker(frame, trackers)
+        #else:
+        #    people_list = update_tracker(frame, trackers)
+        frame = display_output(frame, people_list)
         cv2.imshow("image", frame)
         cv2.waitKey()
-        print(people_list)
+
 
         right, left = count_people(ct, people_list, trackable_objects)
         total_right += right
         total_left += left
         total_frames += 1
 
+
         print("left", total_left)
         print("right", total_right)
-
 
 def display_output(image, res, min_confidence=0.2):
     """
@@ -57,10 +59,29 @@ def display_output(image, res, min_confidence=0.2):
     Returns:
             image: Image with boxes drawn on it.
     """
+    for box in res:
+
+        cv2.rectangle(image, (box[0], box[1]), (box[2], box[3]),
+                        (232, 35, 244), 2)
+
+    # Return image with boxes drawn on it.
+    return image
+
+
+"""
+def display_output(image, res, min_confidence=0.2):
+
+    Decode and display the output.
+    Args:
+            image: Input image.
+            res: Network result.
+    Returns:
+            image: Image with boxes drawn on it.
+
     # Initialize boxes and classes.
     boxes, classes = {}, {}
     data = res[0][0]
-    print(data.shape)
+
     # Enumerate over all proposals.
     for number, proposal in enumerate(data):
         # For all proposals with confidence greater than 0.5.
@@ -86,15 +107,16 @@ def display_output(image, res, min_confidence=0.2):
             if not imid in classes.keys():
                 classes[imid] = []
                 classes[imid].append(label)
-    print(len(classes))
-    print(len(boxes[0]))
+    print(classes)
+    print(boxes)
     # Draw boxes for all predictions.
     for imid in classes:
         for box in boxes[imid]:
+            print("drawing box")
             cv2.rectangle(image, (box[0], box[1]), (box[2], box[3]),
                           (232, 35, 244), 2)
     # Return image with boxes drawn on it.
-    return image
+    return image """
 
 
 def load_network(prototxt_path, model_path):
@@ -185,7 +207,7 @@ def get_people(frame, net, trackers, min_confidence=0.4):
     ]
 
     people_list = []
-    frame = imutils.resize(frame, width = 500)
+
     (height, width) = frame.shape[:2]
 
     blob = cv2.dnn.blobFromImage(frame, 0.007843, (width, height), 127.5)
@@ -208,22 +230,23 @@ def get_people(frame, net, trackers, min_confidence=0.4):
             idx = int(detections[0, 0, i, 1])
             print(idx, classes[idx])
             # if the class label is not a person, ignore it
-         #   if classes[idx] == "person":
-            box = detections[0, 0, i, 3:7] * np.array([width, height, width, height])
-            box = box.astype("int")
-            people_list.append(box)
+            if classes[idx] == "person":
+                print("Person Detected")
+                box = detections[0, 0, i, 3:7] * np.array([width, height, width, height])
+                box = box.astype("int")
+                people_list.append(box)
 
     print(people_list)
     for people in people_list:
         tracker = dlib.correlation_tracker()
-        print("jello3")
+
         (start_x, start_y, end_x, end_y) = people
         rect = dlib.rectangle(start_x, start_y, end_x, end_y)
-        print("Person Detected")
+
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         tracker.start_track(rgb, rect)
         trackers.append(tracker)
-    print("jello4")
+
     #box = detections[0, 0, i, 3:7] * np.array([width, height, width, height])
     #(start_x, start_y, end_x, end_y) = box.astype("int")
 
@@ -266,8 +289,8 @@ def count_people(ct, people_list, trackable_objects):
     left = 0
     right = 0
     objects = ct.update(people_list)
-    height = 1350
-    width = 1000
+    height = 500
+    width = 500
     for (objectID, centroid) in objects.items():
         to = trackable_objects.get(objectID, None)
 
@@ -317,6 +340,18 @@ def write_text(img, text, pos, bg_color):
     cv2.rectangle(img, pos, (end_x, end_y), bg_color, thickness)
     cv2.putText(img, text, pos, font_face, scale, color, 1, cv2.LINE_AA)
     cv2.line(img, (width // 2, 0), (width // 2, height), (0, 0, 255), 2)
+
+    """TEXT = "ID {}".format(objectID)
+    cv2.putText(frame, TEXT, (centroid[1] - 10, centroid[0] - 10),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
+    cv2.circle(frame, (centroid[1], centroid[0]), 4, (255, 255, 255),
+                -1)"""
+
+    WRITER = None
+    if WRITER is not None:
+        WRITER.write(frame)
+
+    return img
 
 
 
