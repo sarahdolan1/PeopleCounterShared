@@ -1,5 +1,3 @@
-#python sarahhh.py -p mobilenet_ssd/MobileNetSSD_deploy.prototxt -m mobilenet_ssd/MobileNetSSD_deploy.caffemodel -i videos/example_07.mp4 -o output/output_wf1.avi
-#cd C:\Users\sarahdol\OneDrive - Intel Corporation\Desktop\people counter\people-counting-opencv
 from pyimagesearch.centroidtracker import CentroidTracker
 from pyimagesearch.trackableobject import TrackableObject
 from imutils.video import VideoStream
@@ -15,14 +13,12 @@ def getNN(protoPath, modelPath):
     net = cv2.dnn.readNetFromCaffe(protoPath, modelPath)
     return net
 
-
 def getDetections(net, frame, W, H):
     blob = cv2.dnn.blobFromImage(frame, 0.007843, (W, H), 127.5)
     net.setInput(blob)
     detections = net.forward()
     status = "Detecting"
     return detections, status
-
 
 def getPeople(detections, CLASSES, W, H, givenConfidence):
     peopleList = []
@@ -38,7 +34,6 @@ def getPeople(detections, CLASSES, W, H, givenConfidence):
             peopleList.append(rect)
     return peopleList
 
-
 def trackPeople(trackers, rgb):
     rects = []
     for tracker in trackers:
@@ -51,7 +46,6 @@ def trackPeople(trackers, rgb):
         rects.append((startX, startY, endX, endY))
     status = "Tracking"
     return rects, status
-
 
 def peopleCounter(videoCapture, net, ct, CLASSES, output_video, fourcc, totalFrames, totalLeft, totalRight, trackableObjects, confidence, skipFrames):
     fps = FPS().start()
@@ -84,8 +78,6 @@ def peopleCounter(videoCapture, net, ct, CLASSES, output_video, fourcc, totalFra
 
         writeonFrame_Line(frame, W, H)
         objects = ct.update(rects)
-
-#         UpdateCount(objects, frame, H, totalLeft, totalRight, trackableObjects)
 
         for (objectID, centroid) in objects.items():
             to = trackableObjects.get(objectID, None)
@@ -120,7 +112,6 @@ def peopleCounter(videoCapture, net, ct, CLASSES, output_video, fourcc, totalFra
 
     return fps.fps()
 
-
 def writeonFrame_Line(frame, W, H):
     cv2.line(frame, (W // 2, 0), (W // 2, H), (0, 0, 255), 2) # To change the dividing Line
     return None
@@ -133,13 +124,12 @@ def writeonFrame_Object(objectID, centroid, frame):
     return None
 
 def writeonFrame_Legend(totalLeft, totalRight, videotime, frame, W, H, status):
-    info = [("Left", totalLeft),("Right", totalRight),("Time", "{:.4f}".format(videotime)),] #("Status", status) - to display status
+    info = [("Left", totalLeft),("Right", totalRight),("Time", "{:.2f}".format(videotime)),] #("Status", status) - to display status
     for (i, (k, v)) in enumerate(info):
         text = "{}: {}".format(k, v)
         cv2.putText(frame, text, (10, H - ((i * 20) + 20)),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
     return None
-
 
 def main(input_video, output_video, protoPath, modelPath):
     CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
@@ -163,32 +153,9 @@ def main(input_video, output_video, protoPath, modelPath):
     print("Approx. FPS: {:.2f}".format(fps))
     return None
 
-
-input_video = './videos/example_03.mp4'
-output_video = './output/output_example_03.avi'
-protoPath = './mobilenet_ssd/MobileNetSSD_deploy.prototxt'
-modelPath = './mobilenet_ssd/MobileNetSSD_deploy.caffemodel'
+input_video = 'videos/final_vid.mp4'
+output_video = 'output/output_final_vid.avi'
+protoPath = 'mobilenet_ssd/MobileNetSSD_deploy.prototxt'
+modelPath = 'mobilenet_ssd/MobileNetSSD_deploy.caffemodel'
 
 main(input_video, output_video, protoPath, modelPath)
-
-
-
-# def updateCount(objects, frame, H, totalLeft, totalRight, trackableObjects):
-#     for (objectID, centroid) in objects.items():
-#         to = trackableObjects.get(objectID, None)
-#         if to is None:
-#             to = TrackableObject(objectID, centroid)
-#         else:
-#             y = [c[1] for c in to.centroids]
-#             direction = centroid[1] - np.mean(y)
-#             to.centroids.append(centroid)
-#             if not to.counted:
-#                 if direction < 0 and centroid[1] < H // 2:
-#                     totalLeft += 1
-#                     to.counted = True
-#                 elif direction > 0 and centroid[1] > H // 2:
-#                     totalRight += 1
-#                     to.counted = True
-#         trackableObjects[objectID] = to
-#         writeonFrame_Object(objectID, centroid, frame)
-#     return None
