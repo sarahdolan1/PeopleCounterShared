@@ -1,3 +1,5 @@
+#python sarahhh.py -p mobilenet_ssd/MobileNetSSD_deploy.prototxt -m mobilenet_ssd/MobileNetSSD_deploy.caffemodel -i videos/example_07.mp4 -o output/output_wf1.avi
+#cd C:\Users\sarahdol\OneDrive - Intel Corporation\Desktop\people counter\people-counting-opencv
 from pyimagesearch.centroidtracker import CentroidTracker
 from pyimagesearch.trackableobject import TrackableObject
 from imutils.video import VideoStream
@@ -91,7 +93,7 @@ def peopleCounter(videoCapture, net, ct, CLASSES, output_video, fourcc, totalFra
                 to = TrackableObject(objectID, centroid)
             else:
                 y = [c[1] for c in to.centroids]
-                direction = centroid[1] - np.mean(y)
+                direction = centroid[0] - np.mean(y)
                 to.centroids.append(centroid)
                 if not to.counted:
                     if direction < 0 and centroid[1] < W // 2:
@@ -146,7 +148,7 @@ def main(input_video, output_video, protoPath, modelPath):
             "sofa", "train", "tvmonitor"]
     videoCapture = cv2.VideoCapture(input_video)
     net = getNN(protoPath, modelPath)
-    ct = CentroidTracker(maxDisappeared=40, maxDistance=50)
+    ct = CentroidTracker(maxDisappeared=40, maxDistance=500)
     fourcc = cv2.VideoWriter_fourcc(*"MJPG")
     trackableObjects = {}
     totalFrames = 0
@@ -162,8 +164,8 @@ def main(input_video, output_video, protoPath, modelPath):
     return None
 
 
-input_video = './videos/webcamfootage.mp4'
-output_video = './output/output_webcamfootage.avi'
+input_video = './videos/example_03.mp4'
+output_video = './output/output_example_03.avi'
 protoPath = './mobilenet_ssd/MobileNetSSD_deploy.prototxt'
 modelPath = './mobilenet_ssd/MobileNetSSD_deploy.caffemodel'
 
