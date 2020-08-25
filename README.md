@@ -8,7 +8,7 @@ inspiration for the code https://www.pyimagesearch.com/2018/08/13/opencv-people-
 * We are currently adding functions to code so there are constant changes in this Git.
 
 ## How To Use:
-for use run : python new_main.py -p mobilenet_ssd\MobileNetSSD_deploy.prototxt -m mobilenet_ssd\MobileNetSSD_deploy.caffemodel  -i videos/example_03.mp4 -o output/output_03.avi
+to run: python people_counter.py -p mobilenet_ssd\MobileNetSSD_deploy.prototxt -m mobilenet_ssd\MobileNetSSD_deploy.caffemodel  -i videos/example_03.mp4 -o output/output_03.avi
 
 ## Folders
 mobilenet_ssd => Contains the MobileNet SSD model used (prototxt and caffe files)  
@@ -36,4 +36,4 @@ If no output argument is given, the output shown will not be saved or stored.
      5. Change directory
           ~ cd C:\Users\<USERNAME>\Documents\PeopleCounterShared
      6. Run the code
-          ~ python new_code.py -p mobilenet_ssd\MobileNetSSD_deploy.prototxt -m mobilenet_ssd\MobileNetSSD_deploy.caffemodel -i example_inputs\LeftRight.mp4 -o example_outputs\LeftRight-O.avi
+          ~ python people_counter.py -p mobilenet_ssd\MobileNetSSD_deploy.prototxt -m mobilenet_ssd\MobileNetSSD_deploy.caffemodel -i example_inputs\LeftRight.mp4 -o example_outputs\LeftRight-O.avi
