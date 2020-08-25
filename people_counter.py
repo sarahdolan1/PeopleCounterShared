@@ -1,110 +1,108 @@
-import argparse
-import time
 import numpy as np
-import imutils
 import cv2
-from imutils.video import VideoStream
 from imutils.video import FPS
 import dlib
 from pyimagesearch.centroidtracker import CentroidTracker
 from pyimagesearch.trackableobject import TrackableObject
 
-def getNN(protoPath, modelPath):
-    net = cv2.dnn.readNetFromCaffe(protoPath, modelPath)
+def get_neural_network(proto_path, model_path):
+    net = cv2.dnn.readNetFromCaffe(proto_path, model_path)
     return net
 
-def getDetections(net, frame, W, H):
-    blob = cv2.dnn.blobFromImage(frame, 0.007843, (W, H), 127.5)
+def get_detections(net, frame, width, height):
+    blob = cv2.dnn.blobFromImage(frame, 0.007843, (width, height), 127.5)
     net.setInput(blob)
     detections = net.forward()
     status = "Detecting"
     return detections, status
 
-def getPeople(detections, CLASSES, W, H, givenConfidence):
-    peopleList = []
+def get_people(detections, classes, width, height, given_confidence):
+    people_list = []
     for i in np.arange(0, detections.shape[2]):
         confidence = detections[0, 0, i, 2]
-        if confidence > givenConfidence:
+        if confidence > given_confidence:
             idx = int(detections[0, 0, i, 1])
-            if CLASSES[idx] != "person":
+            if classes[idx] != "person":
                 continue
-            box = detections[0, 0, i, 3:7] * np.array([W, H, W, H])
-            (startX, startY, endX, endY) = box.astype("int")
-            rect = dlib.rectangle(startX, startY, endX, endY)
-            peopleList.append(rect)
-    return peopleList
+            box = detections[0, 0, i, 3:7] * np.array([width, height, width, height])
+            (start_x, start_y, end_x, end_y) = box.astype("int")
+            rect = dlib.rectangle(start_x, start_y, end_x, end_y)
+            people_list.append(rect)
+    return people_list
 
-def trackPeople(trackers, rgb):
+def track_people(trackers, rgb):
     rects = []
     for tracker in trackers:
         tracker.update(rgb)
         pos = tracker.get_position()
-        startX = int(pos.top())
-        startY = int(pos.left())
-        endX = int(pos.bottom())
-        endY = int(pos.right())
-        rects.append((startX, startY, endX, endY))
+        start_x = int(pos.top())
+        start_y = int(pos.left())
+        end_x = int(pos.bottom())
+        end_y = int(pos.right())
+        rects.append((start_x, start_y, end_x, end_y))
     status = "Tracking"
     return rects, status
 
-def peopleCounter(videoCapture, net, ct, CLASSES, output_video, fourcc, totalFrames, totalLeft, totalRight, trackableObjects, confidence, skipFrames):
+def people_counter(video_capture, net, ct, classes,
+                   output_video, fourcc, total_frames, total_left,
+                   total_right, trackable_objects, confidence, skip_frames):
     fps = FPS().start()
     while True:
-        ok, frame = videoCapture.read()
+        ok, frame = video_capture.read()
         if frame is None: # END of Video Loop
             break
 
         frame = cv2.resize(frame, (640, 480))
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-        (H, W) = frame.shape[:2]
-        writer = cv2.VideoWriter(output_video, fourcc, 30, (W, H), True)
+        (height, width) = frame.shape[:2]
+        writer = cv2.VideoWriter(output_video, fourcc, 30, (width, height), True)
         status = "Waiting"
         rects = []
 
-        videotime = videoCapture.get(cv2.CAP_PROP_POS_MSEC) / 1000
-        if totalFrames % skipFrames == 0:
+        videotime = video_capture.get(cv2.CAP_PROP_POS_MSEC) / 1000
+        if total_frames % skip_frames == 0:
             trackers = []
 
-            detections, status = getDetections(net, frame, W, H)
-            peopleList = getPeople(detections,CLASSES, W, H, confidence)
+            detections, status = get_detections(net, frame, width, height)
+            people_list = get_people(detections, classes, width, height, confidence)
 
-            for rect in peopleList:
+            for rect in people_list:
                 tracker = dlib.correlation_tracker()
                 tracker.start_track(rgb, rect)
                 trackers.append(tracker)
         else:
-            rects, status = trackPeople(trackers, rgb)
+            rects, status = track_people(trackers, rgb)
 
-        writeonFrame_Line(frame, W, H)
+        write_on_frame_line(frame, width, height)
         objects = ct.update(rects)
 
-        for (objectID, centroid) in objects.items():
-            to = trackableObjects.get(objectID, None)
+        for (object_identification, centroid) in objects.items():
+            to = trackable_objects.get(object_identification, None)
             if to is None:
-                to = TrackableObject(objectID, centroid)
+                to = TrackableObject(object_identification, centroid)
             else:
                 y = [c[1] for c in to.centroids]
                 direction = centroid[0] - np.mean(y)
                 to.centroids.append(centroid)
                 if not to.counted:
-                    if direction < 0 and centroid[1] < W // 2:
-                        totalLeft += 1
+                    if direction < 0 and centroid[1] < width // 2:
+                        total_left += 1
                         to.counted = True
-                    elif direction > 0 and centroid[1] > W // 2:
-                        totalRight += 1
+                    elif direction > 0 and centroid[1] > width // 2:
+                        total_right += 1
                         to.counted = True
-            trackableObjects[objectID] = to
-            writeonFrame_Object(objectID, centroid, frame)
+            trackable_objects[object_identification] = to
+            write_on_frame_object(object_identification, centroid, frame)
 
-        writeonFrame_Legend(totalLeft, totalRight, videotime, frame, W, H, status)
+        write_on_frame_legend(total_left, total_right, videotime, frame, height)
         writer.write(frame)
 
         cv2.imshow("People Counter", frame)
         key = cv2.waitKey(1) & 0xFF
         if key == ord("q"):
             break
-        totalFrames += 1
+        total_frames += 1
         fps.update()
 
     fps.stop()
@@ -112,50 +110,54 @@ def peopleCounter(videoCapture, net, ct, CLASSES, output_video, fourcc, totalFra
 
     return fps.fps()
 
-def writeonFrame_Line(frame, W, H):
-    cv2.line(frame, (W // 2, 0), (W // 2, H), (0, 0, 255), 2) # To change the dividing Line
+def write_on_frame_line(frame, width, height):
+    cv2.line(frame, (width // 2, 0), (width // 2, height),
+             (0, 0, 255), 2) # To change the dividing Line
     return None
 
-def writeonFrame_Object(objectID, centroid, frame):
-    text = "ID {}".format(objectID)
+def write_on_frame_object(object_identification, centroid, frame):
+    text = "ID {}".format(object_identification)
     cv2.putText(frame, text, (centroid[1] - 10, centroid[0] - 10),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
     cv2.circle(frame, (centroid[1], centroid[0]), 4, (255, 255, 255), -1)
     return None
 
-def writeonFrame_Legend(totalLeft, totalRight, videotime, frame, W, H, status):
-    info = [("Left", totalLeft),("Right", totalRight),("Time", "{:.2f}".format(videotime)),] #("Status", status) - to display status
+def write_on_frame_legend(total_left, total_right,
+                          videotime, frame, height):
+    info = [("Left", total_left), ("Right", total_right),
+            ("Time", "{:.2f}".format(videotime)),] #("Status", status) - to display status
     for (i, (k, v)) in enumerate(info):
         text = "{}: {}".format(k, v)
-        cv2.putText(frame, text, (10, H - ((i * 20) + 20)),
+        cv2.putText(frame, text, (10, height - ((i * 20) + 20)),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
     return None
 
-def main(input_video, output_video, protoPath, modelPath):
-    CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
-            "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
-            "dog", "horse", "motorbike", "person", "pottedplant", "sheep",
-            "sofa", "train", "tvmonitor"]
-    videoCapture = cv2.VideoCapture(input_video)
-    net = getNN(protoPath, modelPath)
+def main(input_video, output_video, proto_path, model_path):
+    classes = ["background", "aeroplane", "bicycle", "bird", "boat",
+               "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
+               "dog", "horse", "motorbike", "person", "pottedplant", "sheep",
+               "sofa", "train", "tvmonitor"]
+    video_capture = cv2.VideoCapture(input_video)
+    net = get_neural_network(proto_path, model_path)
     ct = CentroidTracker(maxDisappeared=40, maxDistance=500)
     fourcc = cv2.VideoWriter_fourcc(*"MJPG")
-    trackableObjects = {}
-    totalFrames = 0
-    totalRight = 0
-    totalLeft = 0
+    trackable_objects = {}
+    total_frames = 0
+    total_right = 0
+    total_left = 0
     confidence = 0.4
-    skipFrames = 30
+    skip_frames = 30
 
-    fps = peopleCounter(videoCapture, net, ct, CLASSES, output_video, fourcc, totalFrames, totalLeft,
-            totalRight, trackableObjects, confidence, skipFrames)
+    fps = people_counter(video_capture, net, ct, classes,
+                         output_video, fourcc, total_frames, total_left,
+                         total_right, trackable_objects, confidence, skip_frames)
 
     print("Approx. FPS: {:.2f}".format(fps))
     return None
 
 input_video = 'videos/final_vid.mp4'
 output_video = 'output/output_final_vid.avi'
-protoPath = 'mobilenet_ssd/MobileNetSSD_deploy.prototxt'
-modelPath = 'mobilenet_ssd/MobileNetSSD_deploy.caffemodel'
+proto_path = 'mobilenet_ssd/MobileNetSSD_deploy.prototxt'
+model_path = 'mobilenet_ssd/MobileNetSSD_deploy.caffemodel'
 
-main(input_video, output_video, protoPath, modelPath)
+main(input_video, output_video, proto_path, model_path)
