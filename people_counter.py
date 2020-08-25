@@ -1,13 +1,13 @@
-from pyimagesearch.centroidtracker import CentroidTracker
-from pyimagesearch.trackableobject import TrackableObject
+import argparse
+import time
+import numpy as np
+import imutils
+import cv2
 from imutils.video import VideoStream
 from imutils.video import FPS
-import numpy as np
-import argparse
-import imutils
-import time
 import dlib
-import cv2
+from pyimagesearch.centroidtracker import CentroidTracker
+from pyimagesearch.trackableobject import TrackableObject
 
 def getNN(protoPath, modelPath):
     net = cv2.dnn.readNetFromCaffe(protoPath, modelPath)
