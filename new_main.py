@@ -94,10 +94,10 @@ def peopleCounter(videoCapture, net, ct, CLASSES, output_video, fourcc, totalFra
                 direction = centroid[1] - np.mean(y)
                 to.centroids.append(centroid)
                 if not to.counted:
-                    if direction < 0 and centroid[1] < H // 2:
+                    if direction < 0 and centroid[1] < W // 2:
                         totalLeft += 1
                         to.counted = True
-                    elif direction > 0 and centroid[1] > H // 2:
+                    elif direction > 0 and centroid[1] > W // 2:
                         totalRight += 1
                         to.counted = True
             trackableObjects[objectID] = to
@@ -106,7 +106,7 @@ def peopleCounter(videoCapture, net, ct, CLASSES, output_video, fourcc, totalFra
         writeonFrame_Legend(totalLeft, totalRight, videotime, frame, W, H, status)
         writer.write(frame)
 
-        cv2.imshow("Frame", frame)
+        cv2.imshow("People Counter", frame)
         key = cv2.waitKey(1) & 0xFF
         if key == ord("q"):
             break
@@ -125,9 +125,9 @@ def writeonFrame_Line(frame, W, H):
 
 def writeonFrame_Object(objectID, centroid, frame):
     text = "ID {}".format(objectID)
-    cv2.putText(frame, text, (centroid[0] - 10, centroid[1] - 10),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-    cv2.circle(frame, (centroid[0], centroid[1]), 4, (0, 255, 0), -1)
+    cv2.putText(frame, text, (centroid[1] - 10, centroid[0] - 10),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
+    cv2.circle(frame, (centroid[1], centroid[0]), 4, (255, 255, 255), -1)
     return None
 
 def writeonFrame_Legend(totalLeft, totalRight, videotime, frame, W, H, status):
@@ -135,7 +135,7 @@ def writeonFrame_Legend(totalLeft, totalRight, videotime, frame, W, H, status):
     for (i, (k, v)) in enumerate(info):
         text = "{}: {}".format(k, v)
         cv2.putText(frame, text, (10, H - ((i * 20) + 20)),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
     return None
 
 
@@ -190,4 +190,3 @@ main(input_video, output_video, protoPath, modelPath)
 #         trackableObjects[objectID] = to
 #         writeonFrame_Object(objectID, centroid, frame)
 #     return None
-
