@@ -5,7 +5,7 @@ inspiration for the code https://www.pyimagesearch.com/2018/08/13/opencv-people-
 
 ## Recent Updates:
 * All necessary documents have been uploaded; (videos have not, as no videos will be shared for this code).
-* We are currently adding functions to code so there are constant changes in this Git.
+* We have just posted our most recent version of our code that is fully functional & well commented, "people_counter.py".
 
 ## How To Use:
 to run: python people_counter.py 
