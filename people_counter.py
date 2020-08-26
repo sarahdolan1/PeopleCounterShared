@@ -6,10 +6,26 @@ from pyimagesearch.centroidtracker import CentroidTracker
 from pyimagesearch.trackableobject import TrackableObject
 
 def get_neural_network(proto_path, model_path):
+    """" load a caffe network from disk
+    Args:
+            prototxt_path ([type]):filepath for the caffeProto
+            model_path ([type]): Filepath for the caffemodel
+    Returns:
+            net: cv2.dnn network
+    """
     net = cv2.dnn.readNetFromCaffe(proto_path, model_path)
     return net
 
 def get_detections(net, frame, width, height):
+    """ detect people
+    Args:
+            net (cv2.dnn): neural network
+            frame (uint8): image
+            width (length): width of video
+            height (length): height of video
+    Returns:
+            detections, status: detecting any class, stage of tracking
+    """
     blob = cv2.dnn.blobFromImage(frame, 0.007843, (width, height), 127.5)
     net.setInput(blob)
     detections = net.forward()
@@ -17,6 +33,16 @@ def get_detections(net, frame, width, height):
     return detections, status
 
 def get_people(detections, classes, width, height, given_confidence):
+  """ detect people
+    Args:
+            detections ([type]): detecting any class
+            classes ([type]): classes of identification
+            width (length): width of video
+            height (length): height of video
+            given_confidence (float): minimum for detection, defaults to 0.4
+    Returns:
+            people_list: list of bounding boxes containing people
+    """
     people_list = []
     for i in np.arange(0, detections.shape[2]):
         confidence = detections[0, 0, i, 2]
@@ -31,6 +57,13 @@ def get_people(detections, classes, width, height, given_confidence):
     return people_list
 
 def track_people(trackers, rgb):
+  """ how to track a person
+    Args:
+            trackers ([type]): track movements
+            rgb ([type]):  red, green & blue
+    Returns:
+            rects, status: rects, stage of tracking
+    """
     rects = []
     for tracker in trackers:
         tracker.update(rgb)
@@ -46,6 +79,23 @@ def track_people(trackers, rgb):
 def people_counter(video_capture, net, ct, classes,
                    output_video, fourcc, total_frames, total_left,
                    total_right, trackable_objects, confidence, skip_frames):
+  """ Track people over time
+    Args:
+           video_capture ([type]): video
+           net (cv2.dnn): neural network
+           ct ([type]): dlib centroid tracker
+           classes ([type]): classes of identification
+           output_video ([type]): what the output video is saved under
+           fourcc ([type]): video writer
+           total_frames (float): complete number of frames
+           total_left (float): complete number of lefts
+           total_right (float): complete number of rights
+           trackable_objects ([type]): list of objects on screen from classes
+           confidence (float): minimum for detection, defaults to 0.4
+           skip_frames (float): defaults to 30
+    Returns:
+           fps.fps(): frames per second
+    """
     fps = FPS().start()
     while True:
         ok, frame = video_capture.read()
@@ -111,11 +161,33 @@ def people_counter(video_capture, net, ct, classes,
     return fps.fps()
 
 def write_on_frame_line(frame, width, height):
+  """
+    Display the output
+    Args:
+        frame(uint8) : Input Image
+        width(length) : width of frame
+        height(length): height of frame
+
+    Returns:
+        none
+
+    """
     cv2.line(frame, (width // 2, 0), (width // 2, height),
              (0, 0, 255), 2) # To change the dividing Line
     return None
 
 def write_on_frame_object(object_identification, centroid, frame):
+  """
+    Display the output
+    Args:
+         frame(uint8) : Input Image
+         object_identification([type]) :the number given to identify the object
+         centriod ([type]):the centerpoint of the object
+
+    Returns:
+        none
+
+    """
     text = "ID {}".format(object_identification)
     cv2.putText(frame, text, (centroid[1] - 10, centroid[0] - 10),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
@@ -124,6 +196,19 @@ def write_on_frame_object(object_identification, centroid, frame):
 
 def write_on_frame_legend(total_left, total_right,
                           videotime, frame, height):
+  """
+    Display the output
+    Args:
+        total_left(float): total number of lefts
+        total_right(float): total number of right
+        videotime([type]):how long the video the video has played for
+        frame(uint8):Input Image
+        height(length): height of the frame
+
+    Returns:
+        none
+
+    """
     info = [("Left", total_left), ("Right", total_right),
             ("Time", "{:.2f}".format(videotime)),] #("Status", status) - to display status
     for (i, (k, v)) in enumerate(info):
@@ -133,6 +218,7 @@ def write_on_frame_legend(total_left, total_right,
     return None
 
 def main(input_video, output_video, proto_path, model_path):
+
     classes = ["background", "aeroplane", "bicycle", "bird", "boat",
                "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
                "dog", "horse", "motorbike", "person", "pottedplant", "sheep",
