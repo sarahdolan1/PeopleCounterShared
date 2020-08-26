@@ -33,7 +33,7 @@ def get_detections(net, frame, width, height):
     return detections, status
 
 def get_people(detections, classes, width, height, given_confidence):
-  """ detect people
+    """ detect people
     Args:
             detections ([type]): detecting any class
             classes ([type]): classes of identification
@@ -57,7 +57,7 @@ def get_people(detections, classes, width, height, given_confidence):
     return people_list
 
 def track_people(trackers, rgb):
-  """ how to track a person
+    """ how to track a person
     Args:
             trackers ([type]): track movements
             rgb ([type]):  red, green & blue
@@ -79,7 +79,7 @@ def track_people(trackers, rgb):
 def people_counter(video_capture, net, ct, classes,
                    output_video, fourcc, total_frames, total_left,
                    total_right, trackable_objects, confidence, skip_frames):
-  """ Track people over time
+    """ Track people over time
     Args:
            video_capture ([type]): video
            net (cv2.dnn): neural network
@@ -161,7 +161,7 @@ def people_counter(video_capture, net, ct, classes,
     return fps.fps()
 
 def write_on_frame_line(frame, width, height):
-  """
+    """
     Display the output
     Args:
         frame(uint8) : Input Image
@@ -177,7 +177,7 @@ def write_on_frame_line(frame, width, height):
     return None
 
 def write_on_frame_object(object_identification, centroid, frame):
-  """
+    """
     Display the output
     Args:
          frame(uint8) : Input Image
@@ -196,7 +196,7 @@ def write_on_frame_object(object_identification, centroid, frame):
 
 def write_on_frame_legend(total_left, total_right,
                           videotime, frame, height):
-  """
+    """
     Display the output
     Args:
         total_left(float): total number of lefts
