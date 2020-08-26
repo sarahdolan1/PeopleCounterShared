@@ -247,3 +247,4 @@ proto_path = 'mobilenet_ssd/MobileNetSSD_deploy.prototxt'
 model_path = 'mobilenet_ssd/MobileNetSSD_deploy.caffemodel'
 
 main(input_video, output_video, proto_path, model_path)
+ 
