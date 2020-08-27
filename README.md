@@ -12,10 +12,9 @@ to run: python people_counter.py
 ensure: In the code it states the video file name and loaction, so double check that is correct (line 244).
 
 ## Folders
-mobilenet_ssd => Contains the MobileNet SSD model used (prototxt and caffe files)  
-example_inputs => Contains an example video to use for the input argument  
-example_outputs => Contains the outputs given by the example input video  
+mobilenet_ssd => Contains the MobileNet SSD model used (prototxt and caffe files)
 pyimagesearch => Contains further code used to support the main people counter files
+pycache => Contains a random configuration of files
 
 
 ## Setup
