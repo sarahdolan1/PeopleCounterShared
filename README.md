@@ -8,13 +8,13 @@ Inspiration for the code https://www.pyimagesearch.com/2018/08/13/opencv-people-
 * We have just posted our most recent version of our code that is fully functional & well commented, "people_counter.py".
 
 ## How To Use:
-to run: python people_counter.py  
-ensure: In the code it states the video file name and loaction, so double check that is correct (line 244).
+* Run: python people_counter.py  
+* Ensure: In the code it states the video file name and loaction, so double check that is correct (line 244).
 
 ## Folders
-mobilenet_ssd => Contains the MobileNet SSD model used (prototxt and caffe files)
-pyimagesearch => Contains further code used to support the main people counter files
-pycache => Contains a random configuration of files
+* Mobilenet_ssd => Contains the MobileNet SSD model used (prototxt and caffe files)
+* Pyimagesearch => Contains further code used to support the main people counter files
+* Pycache => Contains a random configuration of files
 
 
 ## Setup
