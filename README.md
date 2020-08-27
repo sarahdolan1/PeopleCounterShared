@@ -27,4 +27,4 @@ pycache => Contains a random configuration of files
      5. Change directory
           ~ cd C:\Users\<USERNAME>\Documents\PeopleCounterShared
      6. Run the code
-          ~ python people_counter.py 
+          ~ python people_counter.py
