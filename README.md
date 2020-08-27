@@ -1,7 +1,7 @@
 # People Counter Shared
 As part of our summer internship, We (Sorcha & Sarah) have been asked to make a people counter code.
 This code uses openCV and python to track people walking across a line in the middle of the screen whilst tracking their direction.
-inspiration for the code https://www.pyimagesearch.com/2018/08/13/opencv-people-counter/
+Inspiration for the code https://www.pyimagesearch.com/2018/08/13/opencv-people-counter/
 
 ## Recent Updates:
 * All necessary documents have been uploaded; (videos have not, as no videos will be shared for this code).
@@ -9,6 +9,7 @@ inspiration for the code https://www.pyimagesearch.com/2018/08/13/opencv-people-
 
 ## How To Use:
 to run: python people_counter.py 
+ensure: In the code it states the video file name and loaction, so double check that is correct (line 244).
 
 ## Folders
 mobilenet_ssd => Contains the MobileNet SSD model used (prototxt and caffe files)  
